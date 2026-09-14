@@ -1,0 +1,14 @@
+import {
+  "tanden-inc/strata/core" @strata,
+  "tanden-inc/strata/codec",
+  "tanden-inc/strata/store",
+  "moonbitlang/core/json",
+  "moonbitlang/async",
+  "moonbitlang/core/env",
+}
+
+import {
+  "tanden-inc/strata/testing",
+} for "test"
+
+supported_targets = "+native+js+wasm"

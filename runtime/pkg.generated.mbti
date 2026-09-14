@@ -1,0 +1,132 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "tanden-inc/strata/runtime"
+
+import {
+  "moonbitlang/async",
+  "moonbitlang/core/debug",
+  "moonbitlang/core/json",
+  "tanden-inc/strata/codec",
+  "tanden-inc/strata/core",
+  "tanden-inc/strata/store",
+}
+
+// Values
+pub fn[E, V : ToJson + @json.FromJson] inline(@core.Projection[E, V], into~ : String) -> InlineProjection[E]
+
+// Errors
+pub(all) suberror StreamTerminal {
+  Terminal(stream~ : @core.StreamId)
+} derive(Eq, @debug.Debug)
+
+pub(all) suberror WaitTimeout {
+  WaitTimeout(waiting_for~ : @core.Position, reached~ : @core.Position)
+} derive(Eq, @debug.Debug)
+
+// Types and methods
+pub struct Clock {
+  // private fields
+}
+pub fn Clock::advance(Self, @core.Duration) -> Unit
+pub fn Clock::fixed(@core.Instant) -> Self
+pub fn Clock::manual(@core.Instant) -> Self
+pub fn Clock::now(Self) -> @core.Instant
+pub fn Clock::parse_fixed(String) -> Self raise @core.InvalidInstant
+pub fn Clock::system() -> Self
+
+pub struct CommandHandler[C, E, S, N] {
+  // private fields
+}
+pub async fn[C, E : ToJson + @json.FromJson, S : ToJson + @json.FromJson, N] CommandHandler::execute(Self[C, E, S, N], String, C, ctx~ : @core.Context, expected? : @core.ExpectedVersion, idempotency_key? : String) -> @core.Outcome[E, N]
+pub async fn[C, E : @json.FromJson, S : @json.FromJson, N] CommandHandler::load(Self[C, E, S, N], String, tenant? : String) -> (S, Int)
+pub fn[C, E, S, N] CommandHandler::stream_id(Self[C, E, S, N], String, tenant? : String) -> @core.StreamId
+
+pub struct DcbHandler[C, E, S, N] {
+  // private fields
+}
+pub async fn[C, E : ToJson + @json.FromJson, S : ToJson + @json.FromJson, N] DcbHandler::execute(Self[C, E, S, N], C, ctx~ : @core.Context, idempotency_key? : String) -> @core.Outcome[E, N]
+pub async fn[C, E : @json.FromJson, S, N] DcbHandler::load(Self[C, E, S, N], C) -> (S, @core.Position)
+
+pub struct IdGenerator {
+  // private fields
+}
+pub fn IdGenerator::reserve(Self, now~ : @core.Instant) -> @core.IdBatch
+pub fn IdGenerator::sequential(prefix? : String) -> Self
+pub fn IdGenerator::ulid() -> Self
+
+pub struct InlineProjection[E] {
+  // private fields
+}
+pub fn[E] InlineProjection::table(Self[E]) -> String
+
+pub struct Page {
+  events : Array[@core.StoredEvent]
+  next : @core.Position?
+  // private fields
+}
+pub fn Page::Page(events~ : Array[@core.StoredEvent], next~ : @core.Position?, codec~ : @codec.JsonCodec) -> Self
+pub fn[E : @json.FromJson] Page::decode(Self) -> Array[@core.Recorded[E]] raise @core.DecodeError
+
+pub struct Projector {
+  // private fields
+}
+pub async fn Projector::catch_up(Self) -> Unit
+pub fn Projector::name(Self) -> String
+pub fn Projector::on_forgotten(Self, (String) -> Unit) -> Unit
+pub fn Projector::position(Self) -> @core.Position
+pub async fn Projector::rebuild(Self) -> Unit
+pub async fn Projector::run(Self) -> Unit
+pub fn[X] Projector::start(Self, @async.TaskGroup[X]) -> Unit
+pub async fn Projector::wait_for(Self, @core.Position, timeout~ : @core.Duration) -> Unit
+
+pub struct Reactor {
+  // private fields
+}
+pub async fn Reactor::catch_up(Self) -> Unit
+pub fn Reactor::name(Self) -> String
+pub fn Reactor::position(Self) -> @core.Position
+pub async fn Reactor::run(Self) -> Unit
+pub fn[X] Reactor::start(Self, @async.TaskGroup[X]) -> Unit
+
+pub struct Retry {
+  // private fields
+}
+pub fn Retry::backoff(Self) -> @core.Duration
+pub fn Retry::max(Self) -> Int
+pub fn Retry::none() -> Self
+pub fn Retry::on_conflict(max~ : Int, backoff? : @core.Duration) -> Self
+
+pub struct Runtime {
+  // private fields
+}
+pub fn[St : @store.EventStore] Runtime::Runtime(St, codec? : @codec.JsonCodec, clock? : Clock, ids? : IdGenerator, keys? : &@store.KeyStore) -> Self
+pub fn Runtime::clock(Self) -> Clock
+pub fn Runtime::codec(Self) -> @codec.JsonCodec
+pub fn[C, E : ToJson + @json.FromJson, S : ToJson + @json.FromJson, N] Runtime::dcb_handler(Self, @core.DcbDecider[C, E, S, N], retry? : Retry, snapshot? : SnapshotPolicy) -> DcbHandler[C, E, S, N]
+pub async fn[E : @json.FromJson, V] Runtime::fold(Self, @core.Projection[E, V], @core.Selection) -> V
+pub async fn[E : @json.FromJson, K : Eq + Hash, R] Runtime::fold_keyed(Self, @core.KeyedProjection[E, K, R], @core.Selection) -> Map[K, R]
+pub async fn[V] Runtime::fold_multi(Self, @core.MultiProjection[V]) -> V
+pub async fn Runtime::forget(Self, category~ : String, id~ : String, tenant? : String) -> Unit
+pub fn[C, E : ToJson + @json.FromJson, S : ToJson + @json.FromJson, N] Runtime::handler(Self, @core.Decider[C, E, S, N], retry? : Retry, snapshot? : SnapshotPolicy, inline? : Array[InlineProjection[E]]) -> CommandHandler[C, E, S, N]
+pub fn Runtime::keys(Self) -> &@store.KeyStore
+pub async fn[E : @json.FromJson, V] Runtime::live(Self, @core.Projection[E, V], category~ : String, id~ : String, tenant? : String) -> (V, Int)
+pub fn[V : ToJson + @json.FromJson] Runtime::projector(Self, String, @core.MultiProjection[V], into~ : String) -> Projector
+pub fn[E : @json.FromJson, K : Show + Eq + Hash, R : ToJson + @json.FromJson] Runtime::projector_keyed(Self, String, @core.KeyedProjection[E, K, R], source~ : @core.Selection, into~ : String) -> Projector
+pub fn[E : @json.FromJson] Runtime::reactor(Self, String, source~ : @core.Selection, retry? : @async.RetryMethod, max_retry? : Int, on_failure? : async (@core.StoredEvent, Error) -> Unit, async (@core.Recorded[E]) -> Unit) -> Reactor
+pub async fn Runtime::read(Self, @core.Selection, after? : @core.Position, limit? : Int) -> Page
+pub async fn[C, E : @json.FromJson, S, N, X] Runtime::state_at(Self, @core.Decider[C, E, S, N], @core.Recorded[X]) -> S
+pub fn Runtime::store(Self) -> &@store.EventStore
+pub async fn Runtime::subscribe(Self, @core.Selection, from~ : @core.Position) -> &@store.Subscription
+pub async fn Runtime::unseal(Self, @core.StoredEvent, capability~ : String) -> @core.Metadata
+pub fn Runtime::views(Self) -> &@store.ViewStore
+
+pub struct SnapshotPolicy {
+  // private fields
+}
+pub fn SnapshotPolicy::every(Int, version~ : Int) -> Self
+pub fn SnapshotPolicy::interval(Self) -> Int
+pub fn SnapshotPolicy::never() -> Self
+pub fn SnapshotPolicy::version(Self) -> Int
+
+// Type aliases
+
+// Traits
