@@ -1,0 +1,121 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "tanden-inc/strata/store"
+
+import {
+  "moonbitlang/core/debug",
+  "moonbitlang/core/json",
+  "tanden-inc/strata/core",
+}
+
+// Values
+
+// Errors
+pub(all) suberror KeyDestroyed {
+  KeyDestroyed(subject~ : String)
+} derive(Eq, @debug.Debug)
+
+pub(all) suberror KeyMissing {
+  KeyMissing(subject~ : String)
+} derive(Eq, @debug.Debug)
+
+pub(all) suberror KeySealed {
+  KeySealed(subject~ : String)
+} derive(Eq, @debug.Debug)
+
+// Types and methods
+pub struct AppendResult {
+  events : Array[@core.StoredEvent]
+  version : Int
+  position : @core.Position
+} derive(Eq, @debug.Debug)
+pub fn AppendResult::AppendResult(events~ : Array[@core.StoredEvent], version~ : Int, position~ : @core.Position) -> Self
+
+pub struct Checkpoint {
+  name : String
+  position : @core.Position
+} derive(Eq, ToJson, @debug.Debug, @json.FromJson)
+pub fn Checkpoint::Checkpoint(name~ : String, position~ : @core.Position) -> Self
+
+pub struct MemoryKeyStore {
+  // private fields
+}
+pub fn MemoryKeyStore::MemoryKeyStore() -> Self
+pub fn MemoryKeyStore::unseals(Self) -> Array[(String, String)]
+pub impl KeyStore for MemoryKeyStore
+
+pub struct MemoryStore {
+  // private fields
+}
+pub fn MemoryStore::MemoryStore() -> Self
+pub fn MemoryStore::length(Self) -> Int
+pub impl EventStore for MemoryStore
+
+pub struct MemorySubscription {
+  // private fields
+}
+pub impl Subscription for MemorySubscription
+
+pub struct MemoryViewStore {
+  // private fields
+}
+pub fn MemoryViewStore::MemoryViewStore() -> Self
+pub impl ViewStore for MemoryViewStore
+
+pub(all) enum SnapshotKey {
+  Stream(@core.StreamId, version~ : Int)
+  Dcb(@core.Selection, version~ : Int)
+} derive(Eq, Hash, ToJson, @debug.Debug, @json.FromJson)
+
+pub struct SnapshotRecord {
+  position : @core.Position
+  version : Int
+  state : Json
+} derive(Eq, ToJson, @debug.Debug, @json.FromJson)
+pub fn SnapshotRecord::SnapshotRecord(position~ : @core.Position, version~ : Int, state~ : Json) -> Self
+
+pub struct ViewWrite {
+  table : String
+  key : String
+  value : Json?
+} derive(Eq, @debug.Debug)
+pub fn ViewWrite::ViewWrite(table~ : String, key~ : String, value~ : Json?) -> Self
+
+// Type aliases
+
+// Traits
+pub(open) trait EventStore {
+  async fn append(Self, stream~ : @core.StreamId, condition~ : @core.AppendCondition, events~ : Array[@core.NewEvent], recorded_at~ : @core.Instant, inline? : Array[ViewWrite]) -> AppendResult
+  async fn read(Self, @core.Selection, after? : @core.Position, limit? : Int) -> Array[@core.StoredEvent]
+  async fn read_stream(Self, @core.StreamId, from_version? : Int) -> Array[@core.StoredEvent]
+  async fn head(Self) -> @core.Position
+  async fn find_idempotent(Self, key~ : String, stream? : @core.StreamId) -> Array[@core.StoredEvent]
+  async fn subscribe(Self, @core.Selection, from~ : @core.Position) -> &Subscription
+  async fn load_checkpoint(Self, String) -> @core.Position?
+  async fn save_checkpoint(Self, String, @core.Position) -> Unit
+  async fn load_snapshot(Self, SnapshotKey) -> SnapshotRecord?
+  async fn save_snapshot(Self, SnapshotKey, SnapshotRecord) -> Unit
+  fn views(Self) -> &ViewStore
+}
+
+pub(open) trait KeyStore {
+  async fn key_for(Self, String) -> Bytes
+  async fn destroy(Self, String) -> Unit
+  async fn seal(Self, String) -> Unit
+  async fn unseal(Self, String, capability~ : String) -> Bytes
+}
+
+pub(open) trait Subscription {
+  async fn next(Self, timeout? : @core.Duration) -> Array[@core.StoredEvent]
+  fn position(Self) -> @core.Position
+  fn close(Self) -> Unit
+}
+
+pub(open) trait ViewStore {
+  async fn commit(Self, writes~ : Array[ViewWrite], checkpoint? : Checkpoint) -> Unit
+  async fn checkpoint(Self, String) -> @core.Position?
+  async fn get(Self, table~ : String, key~ : String) -> Json?
+  async fn put(Self, table~ : String, key~ : String, Json) -> Unit
+  async fn delete(Self, table~ : String, key~ : String) -> Unit
+  async fn keys(Self, table~ : String) -> Array[String]
+  async fn swap(Self, from~ : String, to~ : String) -> Unit
+}

@@ -1,0 +1,16 @@
+import {
+  "tanden-inc/strata/core" @strata,
+  "tanden-inc/strata/store",
+}
+
+import {
+  "tanden-inc/strata/testing",
+  "moonbitlang/core/env",
+  "moonbitlang/async",
+} for "test"
+
+supported_targets = "+native"
+
+// Skeleton: every body is a raising stub until the adapter is implemented.
+
+warnings = "-unused_value-unused_field-unused_mut-unused_async-struct_never_constructed"

@@ -1,0 +1,29 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "tanden-inc/strata/store/pg"
+
+import {
+  "tanden-inc/strata/core",
+  "tanden-inc/strata/store",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub struct PgStore {
+  // private fields
+}
+pub fn PgStore::close(Self) -> Unit
+pub async fn PgStore::connect(String) -> Self
+pub async fn PgStore::migrate(Self) -> Unit
+pub impl @store.EventStore for PgStore
+
+pub struct PgViewStore {
+  // private fields
+}
+pub impl @store.ViewStore for PgViewStore
+
+// Type aliases
+
+// Traits
