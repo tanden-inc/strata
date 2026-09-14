@@ -1,0 +1,54 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "tanden-inc/strata/examples/account"
+
+import {
+  "moonbitlang/core/debug",
+  "moonbitlang/core/json",
+  "tanden-inc/strata/core",
+}
+
+// Values
+pub let account : @core.Decider[AccountCmd, AccountEvent, Account, Unit]
+
+pub let balance_view : @core.Projection[AccountEvent, BalanceView]
+
+// Errors
+pub(all) suberror AccountError {
+  AlreadyOpened
+  NotOpened
+  NotOwner
+  NonPositive(amount~ : Int)
+  Insufficient(balance~ : Int, requested~ : Int)
+  NotEmpty(balance~ : Int)
+  AlreadyClosed
+} derive(Eq, @debug.Debug)
+
+// Types and methods
+pub(all) struct Account {
+  owner : @core.Actor?
+  balance : Int
+  closed : Bool
+} derive(Eq, ToJson, @debug.Debug, @json.FromJson)
+
+pub(all) enum AccountCmd {
+  Open
+  Deposit(amount~ : Int)
+  Withdraw(amount~ : Int)
+  Close
+} derive(Eq, @debug.Debug)
+
+pub(all) enum AccountEvent {
+  Opened(owner~ : @core.Actor)
+  Deposited(amount~ : Int, by~ : @core.Actor)
+  Withdrawn(amount~ : Int, by~ : @core.Actor)
+  Closed(by~ : @core.Actor)
+} derive(Eq, ToJson, @debug.Debug, @json.FromJson)
+
+pub(all) struct BalanceView {
+  balance : Int
+  tx_count : Int
+} derive(Eq, ToJson, @debug.Debug, @json.FromJson)
+
+// Type aliases
+
+// Traits

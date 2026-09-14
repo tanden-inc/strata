@@ -1,0 +1,98 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "tanden-inc/strata/examples/ledger"
+
+import {
+  "moonbitlang/core/debug",
+  "moonbitlang/core/json",
+  "tanden-inc/strata/core",
+}
+
+// Values
+pub let charge : @core.Decider[ChargeCmd, ChargeEvent, CodeLedger, ChargeNotice]
+
+pub let code_ledger : @core.KeyedProjection[LedgerEvent, String, CodeRow]
+
+pub fn code_tag(String) -> @core.Tag
+
+pub let ledger : @core.DcbDecider[LedgerCmd, LedgerEvent, Balances, Unit]
+
+pub fn ledger_scope(LedgerCmd) -> @core.Selection
+
+pub fn ledger_tags(LedgerEvent) -> Array[@core.Tag]
+
+// Errors
+pub(all) suberror ChargeError {
+  NonPositive(amount~ : Int)
+} derive(Eq, @debug.Debug)
+
+pub(all) suberror LedgerError {
+  NonPositive(amount~ : Int)
+  Insufficient(code~ : String, available~ : Int, requested~ : Int)
+  UnknownReservation(reservation~ : @core.EventId)
+  UnknownEntry(target~ : @core.EventId)
+  AlreadyReversed(target~ : @core.EventId)
+} derive(Eq, @debug.Debug)
+
+// Types and methods
+pub(all) struct Balances {
+  of : Map[String, Int]
+  reserved : Map[String, Int]
+  entries : Map[String, Entry]
+} derive(Eq, ToJson, @debug.Debug, @json.FromJson)
+pub fn Balances::available(Self, String) -> Int
+pub fn Balances::empty() -> Self
+
+pub(all) enum ChargeCmd {
+  Budget(amount~ : Int)
+  Charge(amount~ : Int, reference~ : String)
+  Explain(reason~ : String, landing~ : Int)
+} derive(Eq, @debug.Debug)
+
+pub(all) enum ChargeEvent {
+  Budgeted(amount~ : Int, by~ : @core.Actor)
+  Charged(id~ : @core.EventId, amount~ : Int, reference~ : String, by~ : @core.Actor)
+  OverrunExplained(reason~ : String, landing~ : Int, by~ : @core.Actor)
+} derive(Eq, ToJson, @debug.Debug, @json.FromJson)
+
+pub(all) enum ChargeNotice {
+  WillOverrun(landing~ : Int)
+  UnfundedCode
+} derive(Eq, ToJson, @debug.Debug)
+
+pub(all) struct CodeLedger {
+  budget : Int
+  balance : Int
+} derive(Eq, ToJson, @debug.Debug, @json.FromJson)
+
+pub(all) struct CodeRow {
+  balance : Int
+  reserved : Int
+  inbound : Int
+  outbound : Int
+} derive(Eq, ToJson, @debug.Debug, @json.FromJson)
+
+pub(all) struct Entry {
+  tags : Array[@core.Tag]
+  reversed : Bool
+} derive(Eq, ToJson, @debug.Debug, @json.FromJson)
+
+pub(all) enum LedgerCmd {
+  Fund(code~ : String, amount~ : Int)
+  Move(from~ : String, to~ : String, amount~ : Int, reason~ : String)
+  Reserve(code~ : String, amount~ : Int, reference~ : String)
+  Release(code~ : String, reservation~ : @core.EventId)
+  Reverse(code~ : String, target~ : @core.EventId, reason~ : String)
+} derive(Eq, @debug.Debug)
+
+pub(all) enum LedgerEvent {
+  Moved(id~ : @core.EventId, from~ : String, to~ : String, amount~ : Int, reason~ : String, by~ : @core.Actor)
+  Funded(code~ : String, amount~ : Int, by~ : @core.Actor)
+  Reserved(id~ : @core.EventId, code~ : String, amount~ : Int, reference~ : String, by~ : @core.Actor)
+  Released(code~ : String, reservation~ : @core.EventId, by~ : @core.Actor)
+  Reversed(of~ : @core.EventId, tags~ : Array[@core.Tag], reason~ : String, by~ : @core.Actor)
+} derive(Eq, ToJson, @debug.Debug, @json.FromJson)
+
+// Type aliases
+pub type Code = String
+
+// Traits
