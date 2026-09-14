@@ -1,0 +1,316 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "tanden-inc/strata/core"
+
+import {
+  "moonbitlang/core/debug",
+  "moonbitlang/core/json",
+  "moonbitlang/core/quickcheck",
+}
+
+// Values
+pub fn is_system_event_type(String) -> Bool
+
+pub let start : Position
+
+pub fn[T] todo(String) -> T raise NotImplemented
+
+// Errors
+pub(all) suberror AppendConflict {
+  StreamConflict(stream~ : StreamId, expected~ : ExpectedVersion, actual~ : Int)
+  BoundaryConflict(selection~ : Selection, after~ : Position?, at~ : Position)
+} derive(Eq, @debug.Debug)
+
+pub(all) suberror DecodeError {
+  DecodeError(event_type~ : String, position~ : Position?, reason~ : String)
+} derive(Eq, @debug.Debug)
+
+pub(all) suberror IdempotencyConflict {
+  KeyReused(key~ : String, stream~ : StreamId?)
+} derive(Eq, @debug.Debug)
+
+pub(all) suberror InvalidInstant {
+  InvalidInstant(String)
+} derive(Eq, @debug.Debug)
+
+pub(all) suberror InvalidStreamId {
+  InvalidStreamId(String)
+} derive(Eq, @debug.Debug)
+
+pub(all) suberror InvalidTag {
+  InvalidTag(Tag)
+} derive(Eq, @debug.Debug)
+
+pub(all) suberror NotImplemented {
+  NotImplemented(String)
+} derive(Eq, @debug.Debug)
+
+// Types and methods
+pub(all) struct Actor(String) derive(Compare, Eq, Hash, @debug.Debug, @quickcheck.Arbitrary)
+pub impl Show for Actor
+pub impl ToJson for Actor
+pub impl @json.FromJson for Actor
+
+pub(all) enum AppendCondition {
+  Stream(StreamId, ExpectedVersion)
+  Dcb(selection~ : Selection, after~ : Position?)
+} derive(Eq, @debug.Debug)
+
+pub struct Context {
+  actor : Actor
+  tenant : String?
+  correlation_id : String?
+  causation_id : EventId?
+  idempotency_key : String?
+  flags : Array[String]
+  extra : Json
+}
+pub fn Context::Context(actor~ : Actor, tenant? : String, correlation_id? : String, causation_id? : EventId, idempotency_key? : String, flags? : Array[String], extra? : Json) -> Self
+pub fn Context::flag(Self, String) -> Bool
+pub fn Context::to_metadata(Self) -> Metadata
+pub fn Context::with_flag(Self, String) -> Self
+pub fn Context::with_idempotency_key(Self, String) -> Self
+
+pub struct DcbDecider[C, E, S, N] {
+  // private fields
+}
+pub fn[C, E, S, N] DcbDecider::DcbDecider(category~ : String, stream~ : (C) -> String, scope~ : (C) -> Selection, tags~ : (E) -> Array[Tag], initial~ : S, decide~ : (C, S, Env, Scope) -> Array[E] raise, evolve~ : (S, E, Scope) -> S, advise? : (C, S, Env, Scope) -> Array[N]) -> Self[C, E, S, N]
+pub fn[C, E, S, N] DcbDecider::category(Self[C, E, S, N]) -> String
+pub fn[C, E, S, N] DcbDecider::evolve(Self[C, E, S, N], S, E, Scope) -> S
+pub fn[C, E, S, N] DcbDecider::initial(Self[C, E, S, N]) -> S
+pub fn[C, E, S, N] DcbDecider::replay(Self[C, E, S, N], Scope, Iter[E]) -> S
+pub fn[C, E, S, N] DcbDecider::replay_from(Self[C, E, S, N], Scope, S, Iter[E]) -> S
+pub fn[C, E, S, N] DcbDecider::run(Self[C, E, S, N], C, S, Env, Scope) -> Decision[E, N] raise
+pub fn[C, E, S, N] DcbDecider::scope_of(Self[C, E, S, N], C) -> Scope
+pub fn[C, E, S, N] DcbDecider::stream_of(Self[C, E, S, N], C) -> String
+pub fn[C, E, S, N] DcbDecider::tags_of(Self[C, E, S, N], E) -> Array[Tag]
+
+pub struct Decider[C, E, S, N] {
+  // private fields
+}
+pub fn[C, E, S, N] Decider::Decider(category~ : String, initial~ : S, decide~ : (C, S, Env) -> Array[E] raise, evolve~ : (S, E) -> S, advise? : (C, S, Env) -> Array[N], tags? : (E) -> Array[Tag], is_terminal? : (S) -> Bool) -> Self[C, E, S, N]
+pub fn[C, E, S, N] Decider::advise(Self[C, E, S, N], C, S, Env) -> Array[N]
+pub fn[C, E, S, N] Decider::category(Self[C, E, S, N]) -> String
+pub fn[C, E, S, N] Decider::decide(Self[C, E, S, N], C, S, Env) -> Array[E] raise
+pub fn[C, E, S, N] Decider::evolve(Self[C, E, S, N], S, E) -> S
+pub fn[C, E, S, N] Decider::initial(Self[C, E, S, N]) -> S
+pub fn[C, E, S, N] Decider::is_terminal(Self[C, E, S, N], S) -> Bool
+pub fn[C, E, S, N] Decider::replay(Self[C, E, S, N], Iter[E]) -> S
+pub fn[C, E, S, N] Decider::replay_from(Self[C, E, S, N], S, Iter[E]) -> S
+pub fn[C, E, S, N] Decider::run(Self[C, E, S, N], C, S, Env) -> Decision[E, N] raise
+pub fn[C, E, S, N] Decider::tags_of(Self[C, E, S, N], E) -> Array[Tag]
+
+pub struct Decision[E, N] {
+  events : Array[E]
+  notices : Array[N]
+} derive(Eq, @debug.Debug)
+pub fn[E, N] Decision::Decision(events~ : Array[E], notices? : Array[N]) -> Self[E, N]
+
+pub(all) struct Duration(Int64) derive(Compare, Eq, Hash, @debug.Debug)
+pub fn Duration::hours(Int64) -> Self
+pub fn Duration::millis(Int64) -> Self
+pub fn Duration::minutes(Int64) -> Self
+pub fn Duration::seconds(Int64) -> Self
+pub fn Duration::to_millis(Self) -> Int64
+pub impl ToJson for Duration
+pub impl @json.FromJson for Duration
+
+pub struct Env {
+  actor : Actor
+  tenant : String?
+  now : Instant
+  ids : IdBatch
+  extra : Json
+}
+pub fn Env::Env(actor~ : Actor, now~ : Instant, tenant? : String, ids? : IdBatch, extra? : Json) -> Self
+
+pub(all) struct EventId(String) derive(Compare, Eq, Hash, @debug.Debug, @quickcheck.Arbitrary)
+pub fn EventId::increment(Self) -> Self
+pub fn EventId::is_ulid(Self) -> Bool
+pub fn EventId::timestamp(Self) -> Instant?
+pub fn EventId::ulid(timestamp~ : Instant, random~ : Bytes) -> Self
+pub impl Show for EventId
+pub impl ToJson for EventId
+pub impl @json.FromJson for EventId
+
+pub(all) enum ExpectedVersion {
+  Any
+  NoStream
+  Exact(Int)
+} derive(Eq, ToJson, @debug.Debug, @json.FromJson)
+
+pub struct IdBatch {
+  // private fields
+}
+pub fn IdBatch::at(Self, Int) -> EventId
+pub fn IdBatch::deterministic(prefix? : String) -> Self
+pub fn IdBatch::from(EventId) -> Self
+pub fn IdBatch::high_water(Self) -> Int
+pub fn IdBatch::offset(Self, Int) -> Self
+
+pub(all) struct Instant(Int64) derive(Compare, Eq, Hash, @debug.Debug, @quickcheck.Arbitrary)
+pub fn Instant::add(Self, Duration) -> Self
+pub fn Instant::parse(String) -> Self raise InvalidInstant
+pub fn Instant::since(Self, Self) -> Duration
+pub fn Instant::to_iso8601(Self) -> String
+pub impl Show for Instant
+pub impl ToJson for Instant
+pub impl @json.FromJson for Instant
+
+pub struct KeyedProjection[E, K, R] {
+  // private fields
+}
+pub fn[E, K, R] KeyedProjection::KeyedProjection(keys~ : (Recorded[E]) -> Array[K], initial~ : R, apply~ : (K, R, Recorded[E]) -> R) -> Self[E, K, R]
+pub fn[E, K, R] KeyedProjection::apply(Self[E, K, R], K, R, Recorded[E]) -> R
+pub fn[E, K : Eq + Hash, R] KeyedProjection::fold(Self[E, K, R], Iter[Recorded[E]]) -> Map[K, R]
+pub fn[E, K, R] KeyedProjection::initial(Self[E, K, R]) -> R
+pub fn[E, K, R] KeyedProjection::keys_of(Self[E, K, R], Recorded[E]) -> Array[K]
+
+pub struct Metadata {
+  correlation_id : String?
+  causation_id : EventId?
+  actor : Actor?
+  tenant : String?
+  idempotency_key : String?
+  extra : Json
+} derive(Eq, ToJson, @debug.Debug, @json.FromJson)
+pub fn Metadata::Metadata(correlation_id? : String, causation_id? : EventId, actor? : Actor, tenant? : String, idempotency_key? : String, extra? : Json) -> Self
+
+pub struct MultiProjection[V] {
+  // private fields
+}
+pub fn[V] MultiProjection::MultiProjection(initial~ : V) -> Self[V]
+pub fn[V] MultiProjection::apply_stored(Self[V], V, StoredEvent) -> V raise DecodeError
+pub fn[V] MultiProjection::initial(Self[V]) -> V
+pub fn[V] MultiProjection::selection(Self[V]) -> Selection
+pub fn[V, E : @json.FromJson] MultiProjection::source(Self[V], Selection, (V, Recorded[E]) -> V) -> Unit
+pub fn[V] MultiProjection::sources(Self[V]) -> Array[Selection]
+
+pub struct NewEvent {
+  id : EventId
+  event_type : String
+  schema : Int
+  data : Json
+  tags : Array[Tag]
+  meta : Metadata
+} derive(Eq, @debug.Debug)
+pub fn NewEvent::NewEvent(id~ : EventId, event_type~ : String, schema~ : Int, data~ : Json, tags? : Array[Tag], meta~ : Metadata) -> Self raise InvalidTag
+
+pub struct Outcome[E, N] {
+  events : Array[Recorded[E]]
+  notices : Array[N]
+  version : Int
+  position : Position
+  deduplicated : Bool
+} derive(Eq, @debug.Debug)
+pub fn[E, N] Outcome::Outcome(events~ : Array[Recorded[E]], notices? : Array[N], version~ : Int, position~ : Position, deduplicated? : Bool) -> Self[E, N]
+
+pub(all) struct Position(Int64) derive(Compare, Eq, Hash, @debug.Debug)
+pub fn Position::next(Self) -> Self
+pub impl Show for Position
+pub impl ToJson for Position
+pub impl @json.FromJson for Position
+
+pub struct Preview[C, E, S, N] {
+  // private fields
+}
+pub fn[C, E, S, N] Preview::Preview(Decider[C, E, S, N], state~ : S, env~ : Env) -> Self[C, E, S, N]
+pub fn[C, E, S, N] Preview::of(Self[C, E, S, N], C) -> PreviewResult[E, N]
+pub fn[C, E, S, N] Preview::state(Self[C, E, S, N]) -> S
+
+pub struct PreviewResult[E, N] {
+  result : Result[Array[E], Error]
+  notices : Array[N]
+}
+pub fn[E, N] PreviewResult::PreviewResult(result~ : Result[Array[E], Error], notices? : Array[N]) -> Self[E, N]
+
+pub struct Projection[E, V] {
+  // private fields
+}
+pub fn[E, V] Projection::Projection(initial~ : V, apply~ : (V, E) -> V) -> Self[E, V]
+pub fn[E, V] Projection::apply(Self[E, V], V, E) -> V
+pub fn[E, V] Projection::fold(Self[E, V], Iter[E]) -> V
+pub fn[E, V] Projection::initial(Self[E, V]) -> V
+
+pub struct Recorded[E] {
+  id : EventId
+  position : Position
+  stream : StreamId
+  version : Int
+  event_type : String
+  event : E
+  tags : Array[Tag]
+  recorded_at : Instant
+  meta : Metadata
+} derive(Eq, @debug.Debug)
+pub fn[E] Recorded::Recorded(id~ : EventId, position~ : Position, stream~ : StreamId, version~ : Int, event_type~ : String, event~ : E, tags? : Array[Tag], recorded_at~ : Instant, meta~ : Metadata) -> Self[E]
+pub fn[E] Recorded::caused(Self[E], actor? : Actor) -> Context
+pub fn[E] Recorded::entity_id(Self[E]) -> String
+pub fn[E] Recorded::from_stored(StoredEvent, E) -> Self[E]
+
+pub struct Scope {
+  // private fields
+}
+pub fn Scope::of(Selection) -> Self
+pub fn Scope::owns(Self, Tag) -> Bool
+pub fn Scope::selection(Self) -> Selection
+
+pub struct Selection {
+  // private fields
+} derive(Eq, Hash, @debug.Debug)
+pub fn Selection::all() -> Self
+pub fn Selection::any_of(Array[Self]) -> Self
+pub fn Selection::category(String, tenant? : String) -> Self
+pub fn Selection::is_all(Self) -> Bool
+pub fn Selection::items(Self) -> Array[SelectionItem]
+pub fn Selection::matches(Self, event_type~ : String, tags~ : Array[Tag]) -> Bool
+pub fn Selection::none() -> Self
+pub fn Selection::single_stream(Self) -> StreamId?
+pub fn Selection::stream(StreamId) -> Self
+pub fn Selection::tags(Array[Tag]) -> Self
+pub fn Selection::types(Array[String], tags? : Array[Tag]) -> Self
+pub impl ToJson for Selection
+pub impl @json.FromJson for Selection
+
+pub struct SelectionItem {
+  types : Array[String]
+  tags : Array[Tag]
+} derive(Eq, Hash, ToJson, @debug.Debug, @json.FromJson)
+pub fn SelectionItem::SelectionItem(types? : Array[String], tags? : Array[Tag]) -> Self
+
+pub struct StoredEvent {
+  id : EventId
+  position : Position
+  stream : StreamId
+  version : Int
+  event_type : String
+  schema : Int
+  data : Json
+  tags : Array[Tag]
+  meta : Metadata
+  recorded_at : Instant
+} derive(Eq, ToJson, @debug.Debug, @json.FromJson)
+pub fn StoredEvent::StoredEvent(id~ : EventId, position~ : Position, stream~ : StreamId, version~ : Int, event_type~ : String, schema~ : Int, data~ : Json, tags? : Array[Tag], meta~ : Metadata, recorded_at~ : Instant) -> Self
+pub fn StoredEvent::user_tags(Self) -> Array[Tag]
+
+pub(all) struct StreamId(String) derive(Compare, Eq, Hash, @debug.Debug)
+pub fn StreamId::category(Self) -> String
+pub fn StreamId::entity_id(Self) -> String
+pub fn StreamId::of(category~ : String, id~ : String, tenant? : String) -> Self
+pub fn StreamId::parse(String) -> Self raise InvalidStreamId
+pub fn StreamId::tenant(Self) -> String?
+pub impl Show for StreamId
+pub impl ToJson for StreamId
+pub impl @json.FromJson for StreamId
+
+pub(all) struct Tag(String) derive(Compare, Eq, Hash, @debug.Debug)
+pub fn Tag::is_system(Self) -> Bool
+pub fn Tag::key(Self) -> String
+pub fn Tag::kv(key~ : String, value~ : String) -> Self
+pub fn Tag::value(Self) -> String?
+pub impl Show for Tag
+pub impl ToJson for Tag
+pub impl @json.FromJson for Tag
+
+// Type aliases
+
+// Traits
