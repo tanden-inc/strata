@@ -1,0 +1,13 @@
+#!/bin/sh
+# Pre-commit: format check, type check, and interface drift check.
+# Install with `make setup` (sets core.hooksPath to .githooks).
+set -e
+export _ZO_DOCTOR=0
+moon fmt --check
+moon check --deny-warn --target native
+moon info
+if ! git diff --quiet -- '*.mbti'; then
+  echo "pkg.generated.mbti changed; review and stage the interface diff:" >&2
+  git --no-pager diff --stat -- '*.mbti' >&2
+  exit 1
+fi

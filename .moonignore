@@ -1,0 +1,11 @@
+# Files excluded from `moon package` / `moon publish` (overrides .gitignore here).
+examples/
+benchmarks/
+docs/
+.github/
+.githooks/
+.vscode/
+Makefile
+CONTRIBUTING.md
+AGENTS.md
+CLAUDE.md

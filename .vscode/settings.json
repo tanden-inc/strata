@@ -1,0 +1,10 @@
+{
+  "editor.formatOnSave": true,
+  "[moonbit]": {
+    "editor.defaultFormatter": "moonbit.moonbit-lang"
+  },
+  "files.exclude": {
+    "_build": true,
+    ".mooncakes": true
+  }
+}
