@@ -1,0 +1,93 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "tanden-inc/strata/testing"
+
+import {
+  "moonbitlang/core/debug",
+  "moonbitlang/core/json",
+  "moonbitlang/core/quickcheck/splitmix",
+  "tanden-inc/strata/codec",
+  "tanden-inc/strata/core",
+  "tanden-inc/strata/runtime",
+  "tanden-inc/strata/store",
+}
+
+// Values
+#callsite(autofill(loc))
+pub fn[C, E, S, N : Eq + @debug.Debug] advice_law(@core.Decider[C, E, S, N], histories~ : Array[Array[E]], commands~ : Array[C], loc~ : SourceLoc) -> Unit raise
+
+pub fn arbitrary_env(Int, @splitmix.RandomState) -> @core.Env
+
+pub fn arbitrary_selection(Int, @splitmix.RandomState) -> @core.Selection
+
+pub fn arbitrary_tag(Int, @splitmix.RandomState) -> @core.Tag
+
+#callsite(autofill(loc))
+pub async fn[St : @store.EventStore] contract(make~ : async () -> St, loc~ : SourceLoc) -> Unit
+
+pub fn contract_cases() -> Array[String]
+
+#callsite(autofill(loc))
+pub fn[C, E : Eq + @debug.Debug, S, N] dcb_reversal_law(@core.DcbDecider[C, E, S, N], reverses~ : (E) -> @core.EventId?, identity~ : (E) -> @core.EventId?, histories~ : Array[Array[E]], restores? : (S, S) -> Bool, loc~ : SourceLoc) -> Unit raise
+
+pub fn[C, E, S, N] dcb_spec(@core.DcbDecider[C, E, S, N]) -> DcbSpec[C, E, S, N]
+
+pub fn env(actor? : @core.Actor, now? : @core.Instant, tenant? : String, ids? : @core.IdBatch) -> @core.Env
+
+pub fn[E] recorded(E, stream~ : @core.StreamId, version~ : Int, position~ : @core.Position, id? : @core.EventId, event_type? : String, actor? : @core.Actor, at? : @core.Instant, tags? : Array[@core.Tag]) -> @core.Recorded[E]
+
+#callsite(autofill(loc))
+pub fn[C, E, S : Eq + @debug.Debug, N] replay_law(@core.Decider[C, E, S, N], Array[E], loc~ : SourceLoc) -> Unit raise
+
+#callsite(autofill(loc))
+pub fn[C, E : Eq + @debug.Debug, S, N] reversal_law(@core.Decider[C, E, S, N], reverses~ : (E) -> @core.EventId?, identity~ : (E) -> @core.EventId?, histories~ : Array[Array[E]], restores? : (S, S) -> Bool, loc~ : SourceLoc) -> Unit raise
+
+pub fn runtime(clock? : @runtime.Clock, ids? : @runtime.IdGenerator, codec? : @codec.JsonCodec) -> @runtime.Runtime
+
+pub fn[C, E, S, N] spec(@core.Decider[C, E, S, N]) -> Spec[C, E, S, N]
+
+pub fn stored(event_type~ : String, data~ : Json, stream~ : @core.StreamId, version~ : Int, position~ : @core.Position, schema? : Int, id? : @core.EventId, tags? : Array[@core.Tag], at? : @core.Instant) -> @core.StoredEvent
+
+// Errors
+
+// Types and methods
+pub struct DcbSpec[C, E, S, N] {
+  // private fields
+}
+pub fn[C, E, S, N] DcbSpec::acting_as(Self[C, E, S, N], actor~ : @core.Actor, tenant? : String) -> Self[C, E, S, N]
+pub fn[C, E, S, N] DcbSpec::advice(Self[C, E, S, N], C) -> Array[N]
+#callsite(autofill(loc))
+pub fn[C, E, S : Eq + @debug.Debug, N] DcbSpec::assert_scope_closed(Self[C, E, S, N], loc~ : SourceLoc) -> Unit raise
+pub fn[C, E, S, N] DcbSpec::given(Self[C, E, S, N], Array[E]) -> Self[C, E, S, N]
+pub fn[C, E, S, N] DcbSpec::scope_of(Self[C, E, S, N], C) -> Self[C, E, S, N]
+pub fn[C, E, S, N] DcbSpec::state(Self[C, E, S, N]) -> S
+pub fn[C, E, S, N] DcbSpec::when(Self[C, E, S, N], C) -> Result[Array[E], Error]
+
+pub struct FixtureReport[E] {
+  decoded : Array[@core.Recorded[E]]
+  skipped : Int
+} derive(Eq, @debug.Debug)
+
+pub struct Fixtures {
+  // private fields
+}
+pub fn[E : @json.FromJson] Fixtures::all_decode(Self, @codec.JsonCodec) -> FixtureReport[E] raise
+pub fn Fixtures::from_json(Array[(String, Int, Json)]) -> Self
+pub fn Fixtures::from_stored(Array[@core.StoredEvent]) -> Self
+
+pub struct Spec[C, E, S, N] {
+  // private fields
+}
+pub fn[C, E, S, N] Spec::acting_as(Self[C, E, S, N], actor~ : @core.Actor, tenant? : String) -> Self[C, E, S, N]
+pub fn[C, E, S, N] Spec::advice(Self[C, E, S, N], C) -> Array[N]
+pub fn[C, E, S, N] Spec::at(Self[C, E, S, N], @core.Instant) -> Self[C, E, S, N]
+pub fn[C, E, S, N] Spec::decision(Self[C, E, S, N], C) -> Result[@core.Decision[E, N], Error]
+pub fn[C, E, S, N] Spec::given(Self[C, E, S, N], Array[E]) -> Self[C, E, S, N]
+pub fn[C, E, S, N] Spec::state(Self[C, E, S, N]) -> S
+pub fn[C, E, S, N] Spec::when(Self[C, E, S, N], C) -> Result[Array[E], Error]
+pub fn[C, E, S, N] Spec::when_all(Self[C, E, S, N], Array[C]) -> Result[Array[E], Error]
+pub fn[C, E, S, N] Spec::with_env(Self[C, E, S, N], @core.Env) -> Self[C, E, S, N]
+pub fn[C, E, S, N] Spec::with_ids(Self[C, E, S, N], @core.IdBatch) -> Self[C, E, S, N]
+
+// Type aliases
+
+// Traits

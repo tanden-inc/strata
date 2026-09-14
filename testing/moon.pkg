@@ -1,0 +1,19 @@
+import {
+  "tanden-inc/strata/core" @strata,
+  "tanden-inc/strata/codec",
+  "tanden-inc/strata/store",
+  "tanden-inc/strata/runtime" @rt,
+  "moonbitlang/core/json",
+  "moonbitlang/core/quickcheck",
+}
+
+import {
+  "moonbitlang/async",
+  "moonbitlang/core/quickcheck/splitmix",
+} for "test"
+
+import {
+  "moonbitlang/async",
+} for "wbtest"
+
+supported_targets = "+native+js+wasm"
