@@ -1,4 +1,7 @@
 ///|
+// #region code
+
+///|
 /// A cost code such as `"ORG-CORE01"`.
 pub type Code = String
 
@@ -7,6 +10,10 @@ pub type Code = String
 pub fn code_tag(code : Code) -> @strata.Tag {
   @strata.Tag("code:\{code}")
 }
+// #endregion code
+
+///|
+// #region events
 
 ///|
 /// Budget movements between codes. Conservation is the invariant: a move
@@ -46,6 +53,10 @@ pub(all) enum LedgerCmd {
   Release(code~ : Code, reservation~ : @strata.EventId)
   Reverse(code~ : Code, target~ : @strata.EventId, reason~ : String)
 } derive(Eq, Debug)
+// #endregion events
+
+///|
+// #region state
 
 ///|
 /// What the ledger remembers about an entry so that it can be reversed.
@@ -74,6 +85,7 @@ pub fn Balances::empty() -> Balances {
 pub fn Balances::available(self : Balances, code : Code) -> Int {
   self.of.get(code).unwrap_or(0) - self.reserved.get(code).unwrap_or(0)
 }
+// #endregion state
 
 ///|
 /// Adds to a code's balance (a copy; state stays a value).
@@ -102,6 +114,9 @@ fn Balances::remember(
 }
 
 ///|
+// #region errors
+
+///|
 /// Typed rejections.
 pub(all) suberror LedgerError {
   NonPositive(amount~ : Int)
@@ -110,6 +125,10 @@ pub(all) suberror LedgerError {
   UnknownEntry(target~ : @strata.EventId)
   AlreadyReversed(target~ : @strata.EventId)
 } derive(Eq, Debug)
+// #endregion errors
+
+///|
+// #region boundary
 
 ///|
 /// Tags are computed from the event alone, on purpose.
@@ -137,6 +156,10 @@ pub fn ledger_scope(cmd : LedgerCmd) -> @strata.Selection {
     | Reverse(code~, ..) => @strata.Selection::tags([code_tag(code)])
   }
 }
+// #endregion boundary
+
+///|
+// #region decider
 
 ///|
 /// The ledger decider.
@@ -244,6 +267,10 @@ pub let ledger : @strata.DcbDecider[LedgerCmd, LedgerEvent, Balances, Unit] = @s
     }
   },
 )
+// #endregion decider
+
+///|
+// #region keyed
 
 ///|
 /// One row per code for the ledger board.
@@ -278,3 +305,4 @@ pub let code_ledger : @strata.KeyedProjection[LedgerEvent, Code, CodeRow] = @str
     }
   },
 )
+// #endregion keyed

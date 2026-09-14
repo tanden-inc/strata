@@ -1,4 +1,7 @@
 ///|
+// #region types
+
+///|
 /// A record-first domain: charges against a code are recorded even when they
 /// overrun; the caller is told.
 pub(all) enum ChargeEvent {
@@ -39,6 +42,10 @@ pub(all) struct CodeLedger {
 pub(all) suberror ChargeError {
   NonPositive(amount~ : Int)
 } derive(Eq, Debug)
+// #endregion types
+
+///|
+// #region decider
 
 ///|
 /// The charge decider: `decide` records, `advise` warns.
@@ -78,3 +85,4 @@ pub let charge : @strata.Decider[
     }
   },
 )
+// #endregion decider

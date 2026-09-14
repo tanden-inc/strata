@@ -1,0 +1,14 @@
+{
+  "name": "strata-docs",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vitepress dev",
+    "build": "vitepress build",
+    "preview": "vitepress preview"
+  },
+  "devDependencies": {
+    "tm-grammars": "^1.32.18",
+    "vitepress": "^1.6.4"
+  }
+}

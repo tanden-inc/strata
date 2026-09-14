@@ -1,4 +1,5 @@
 ///|
+// #region legacy
 priv enum LegacyAccount {
   Opened(owner~ : String)
   Closed
@@ -25,8 +26,10 @@ test "legacy style decodes, upgrades, and handles payload-less variants" {
   )
   debug_inspect(closed.map(x => x.event), content="Some(Closed)")
 }
+// #endregion legacy
 
 ///|
+// #region system-events
 test "system events ($strata.*) are skipped by decode like deprecated types" {
   let codec = @codec.JsonCodec()
   let marker : @strata.Recorded[LegacyAccount]? = codec.decode(
@@ -38,3 +41,4 @@ test "system events ($strata.*) are skipped by decode like deprecated types" {
   ])
   inspect(all.length(), content="0")
 }
+// #endregion system-events

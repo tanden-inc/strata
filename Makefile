@@ -2,7 +2,7 @@
 MOON ?= moon
 PURE_PKGS := tanden-inc/strata/core tanden-inc/strata/codec
 
-.PHONY: help setup check check-wasm-gc test test-js test-wasm-gc test-all fmt fmt-check info cov bench todo ci clean
+.PHONY: help setup check check-wasm-gc test test-js test-wasm-gc test-all fmt fmt-check info cov bench todo ci clean docs docs-build
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-14s %s\n", $$1, $$2}'
@@ -53,3 +53,9 @@ ci: fmt-check check check-wasm-gc info test test-js test-wasm-gc ## Everything C
 
 clean: ## Remove build outputs
 	$(MOON) clean
+
+docs: ## Serve the documentation site locally (docs/, VitePress via bun)
+	cd docs && bun install && bun run dev
+
+docs-build: ## Build the documentation site into docs/.vitepress/dist
+	cd docs && bun install --frozen-lockfile && bun run build

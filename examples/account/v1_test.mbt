@@ -1,4 +1,5 @@
 ///|
+// #region tenant
 async test "tenants prefix the stream name and scope reads" {
   let rt = @testing.runtime()
   let accounts = rt.handler(@account.account)
@@ -18,8 +19,10 @@ async test "tenants prefix the stream name and scope reads" {
     content="0",
   )
 }
+// #endregion tenant
 
 ///|
+// #region retry
 async test "retry on conflict never retries a domain rejection" {
   let rt = @testing.runtime()
   let accounts = rt.handler(
@@ -40,3 +43,4 @@ async test "retry on conflict never retries a domain rejection" {
   inspect(version, content="1")
   inspect(state.balance, content="0")
 }
+// #endregion retry

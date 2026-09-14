@@ -1,4 +1,5 @@
 ///|
+// #region counter
 #warnings("-unused_value")
 priv enum Cmd {
   Add(Int)
@@ -38,6 +39,7 @@ let total : @strata.Projection[Ev, Int] = @strata.Projection(initial=0, apply=(
 
 ///|
 let ctx : @strata.Context = @strata.Context(actor=@strata.Actor("user:test"))
+// #endregion counter
 
 ///|
 test "clocks" {
@@ -146,6 +148,7 @@ async test "idempotency: a different command under the same key is a conflict" {
 }
 
 ///|
+// #region inline
 async test "inline projections are written with the append" {
   let rt = @testing.runtime()
   let h = rt.handler(counter, inline=[@runtime.inline(total, into="totals")])
@@ -156,8 +159,10 @@ async test "inline projections are written with the append" {
     content="Some(Number(3))",
   )
 }
+// #endregion inline
 
 ///|
+// #region projector
 async test "projectors chase the log and wait_for returns after the position" {
   let rt = @testing.runtime()
   let h = rt.handler(counter)
@@ -183,8 +188,10 @@ async test "projectors chase the log and wait_for returns after the position" {
   })
   inspect(projector.position(), content="1")
 }
+// #endregion projector
 
 ///|
+// #region reactor
 async test "reactors receive decoded events and checkpoint" {
   let rt = @testing.runtime()
   let h = rt.handler(counter)
@@ -204,8 +211,10 @@ async test "reactors receive decoded events and checkpoint" {
   inspect(reactor.position(), content="1")
   debug_inspect(rt.store().load_checkpoint("echo"), content="Some(Position(1))")
 }
+// #endregion reactor
 
 ///|
+// #region state-at
 async test "state_at replays a stream up to the event's version" {
   let rt = @testing.runtime()
   let h = rt.handler(counter)
@@ -213,3 +222,4 @@ async test "state_at replays a stream up to the event's version" {
   h.execute("c1", Add(10), ctx~) |> ignore
   inspect(rt.state_at(counter, first.events[0]), content="1")
 }
+// #endregion state-at

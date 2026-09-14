@@ -2,6 +2,7 @@
 let alice : @strata.Actor = @strata.Actor("user:alice")
 
 ///|
+// #region history
 let history : Array[@ledger.LedgerEvent] = [
   Funded(code="X", amount=100, by=alice),
   Funded(code="Y", amount=50, by=alice),
@@ -15,8 +16,10 @@ let history : Array[@ledger.LedgerEvent] = [
     by=alice,
   ),
 ]
+// #endregion history
 
 ///|
+// #region dcb-spec
 test "a move needs available budget on the source" {
   @testing.dcb_spec(@ledger.ledger)
   .acting_as(actor=alice)
@@ -50,8 +53,10 @@ test "a move debits one code and credits the other in one fact" {
     ),
   )
 }
+// #endregion dcb-spec
 
 ///|
+// #region partial-world
 test "state depends only on the scope" {
   @testing.dcb_spec(@ledger.ledger)
   .given(history)
@@ -79,8 +84,10 @@ test "out-of-scope codes are not written to state" {
   inspect(state.available("Y"), content="50")
   inspect(state.available("Z"), content="0")
 }
+// #endregion partial-world
 
 ///|
+// #region reversal-law
 test "reversals stay inside their target's boundary" {
   let reversal_history : Array[@ledger.LedgerEvent] = history +
     [
@@ -108,8 +115,10 @@ test "reversals stay inside their target's boundary" {
     histories=[reversal_history],
   )
 }
+// #endregion reversal-law
 
 ///|
+// #region reversal-twice
 test "reversing twice is rejected" {
   @testing.dcb_spec(@ledger.ledger)
   .acting_as(actor=alice)
@@ -127,8 +136,10 @@ test "reversing twice is rejected" {
   .when(Reverse(code="X", target=@strata.EventId("m-1"), reason="again"))
   |> debug_inspect(content="Err(AlreadyReversed(target=EventId(\"m-1\")))")
 }
+// #endregion reversal-twice
 
 ///|
+// #region advice
 test "charging past the balance is recorded and flagged" {
   let spec = @testing.spec(@ledger.charge)
     .acting_as(actor=alice)
@@ -164,8 +175,10 @@ test "a rejected command gets its error, not commentary" {
   |> debug_inspect(content="Err(NonPositive(amount=0))")
   spec.advice(Charge(amount=0, reference="x")) |> debug_inspect(content="[]")
 }
+// #endregion advice
 
 ///|
+// #region keyed-fold
 test "the code ledger fans a move out to both codes" {
   let rows = @ledger.code_ledger.fold(
     [
@@ -200,8 +213,10 @@ test "the code ledger fans a move out to both codes" {
     content="Some({ balance: 30, reserved: 0, inbound: 1, outbound: 0 })",
   )
 }
+// #endregion keyed-fold
 
 ///|
+// #region dcb-handler
 async test "moves go through the DCB handler and land in the source stream" {
   let rt = @testing.runtime()
   let codes = rt.dcb_handler(@ledger.ledger)
@@ -219,8 +234,10 @@ async test "moves go through the DCB handler and land in the source stream" {
   )
   debug_inspect(rows.get("Y").map(r => r.balance), content="Some(30)")
 }
+// #endregion dcb-handler
 
 ///|
+// #region boundary-conflict
 async test "a boundary conflict surfaces as AppendConflict" {
   let rt = @testing.runtime()
   let ctx = @strata.Context(actor=alice)
@@ -270,3 +287,4 @@ async test "a boundary conflict surfaces as AppendConflict" {
   }
   assert_true(conflict)
 }
+// #endregion boundary-conflict
