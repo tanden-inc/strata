@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" role="img" aria-label="Strata">
+  <rect x="8" y="16" width="104" height="18" rx="4" fill="#1f3a5f"/>
+  <rect x="8" y="40" width="104" height="18" rx="4" fill="#2e5c8a"/>
+  <rect x="8" y="64" width="104" height="18" rx="4" fill="#4d84b8"/>
+  <rect x="8" y="88" width="104" height="18" rx="4" fill="#8fb8dd"/>
+  <rect x="72" y="16" width="8" height="90" fill="#f4b942"/>
+</svg>
