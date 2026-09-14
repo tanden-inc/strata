@@ -1,4 +1,7 @@
 ///|
+// #region events
+
+///|
 /// Facts about an account. Actors are recorded where the domain cares.
 pub(all) enum AccountEvent {
   Opened(owner~ : @strata.Actor)
@@ -6,6 +9,10 @@ pub(all) enum AccountEvent {
   Withdrawn(amount~ : Int, by~ : @strata.Actor)
   Closed(by~ : @strata.Actor)
 } derive(Eq, Debug, ToJson, FromJson)
+// #endregion events
+
+///|
+// #region commands
 
 ///|
 /// Intents. Commands do not say who or when; that is the environment's job.
@@ -15,6 +22,10 @@ pub(all) enum AccountCmd {
   Withdraw(amount~ : Int)
   Close
 } derive(Eq, Debug)
+// #endregion commands
+
+///|
+// #region state
 
 ///|
 /// The state, a fold over events.
@@ -23,6 +34,10 @@ pub(all) struct Account {
   balance : Int
   closed : Bool
 } derive(Eq, Debug, ToJson, FromJson)
+// #endregion state
+
+///|
+// #region errors
 
 ///|
 /// Typed rejections.
@@ -35,6 +50,10 @@ pub(all) suberror AccountError {
   NotEmpty(balance~ : Int)
   AlreadyClosed
 } derive(Eq, Debug)
+// #endregion errors
+
+///|
+// #region decider
 
 ///|
 /// The account decider: guard-first, no advice.
@@ -72,6 +91,10 @@ pub let account : @strata.Decider[AccountCmd, AccountEvent, Account, Unit] = @st
   },
   is_terminal=s => s.closed,
 )
+// #endregion decider
+
+///|
+// #region view
 
 ///|
 /// A live view: balance and transaction count.
@@ -94,3 +117,4 @@ pub let balance_view : @strata.Projection[AccountEvent, BalanceView] = @strata.P
     }
   },
 )
+// #endregion view

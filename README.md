@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/strata.svg" width="120" alt="Strata">
+  <img src="docs/public/strata.svg" width="120" alt="Strata">
 </p>
 
 <h1 align="center">Strata</h1>
@@ -13,6 +13,14 @@
   <img src="https://img.shields.io/badge/targets-native%20%7C%20js%20%7C%20wasm--gc-blue" alt="targets">
   <img src="https://img.shields.io/badge/MoonBit-0.10%2B-lightgrey" alt="MoonBit 0.10+">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-green" alt="License"></a>
+  <a href="https://tanden-inc.github.io/strata/"><img src="https://img.shields.io/badge/docs-tanden--inc.github.io%2Fstrata-1f3a5f" alt="Documentation"></a>
+</p>
+
+<p align="center">
+  <a href="https://tanden-inc.github.io/strata/">Documentation</a> ·
+  <a href="https://tanden-inc.github.io/strata/guide/quickstart">Quickstart</a> ·
+  <a href="https://tanden-inc.github.io/strata/tutorial/01-your-first-decider">Tutorial</a> ·
+  <a href="https://tanden-inc.github.io/strata/reference/core">Reference</a>
 </p>
 
 ---
@@ -552,7 +560,7 @@ let req = rt.state_at(assignment, r).request   // replay pinned to (r.stream, r.
 ```
 
 `state_at` is a runtime call, so it is available to reactors and API handlers; a projection's `apply` is pure and
-needs the fat event. Whether to ship fat events or lean on `state_at` is a domain trade-off; Strata supports both and the [design notes](docs/events-fat-or-thin.md) discuss when each wins.
+needs the fat event. Whether to ship fat events or lean on `state_at` is a domain trade-off; Strata supports both and the [design notes](https://tanden-inc.github.io/strata/concepts/read-models#fat-or-thin-events) discuss when each wins.
 
 ### Reactors and process managers
 
@@ -691,7 +699,7 @@ test "reversals stay inside their target's boundary" {
 }
 ```
 
-Because the reversal is itself an event, the fact that a correction happened, who made it, and why, are as permanent as the entry that was corrected. [`docs/reversals.md`](docs/reversals.md) covers partial reversals, reversing a reversal, and closing periods with open corrections.
+Because the reversal is itself an event, the fact that a correction happened, who made it, and why, are as permanent as the entry that was corrected. [the reversals page](https://tanden-inc.github.io/strata/concepts/reversals) covers partial reversals, reversing a reversal, and closing periods with open corrections.
 
 ### Schema evolution
 
@@ -830,7 +838,7 @@ let out = codes.execute(Move(..), ctx=@gql.context(req), expected=@gql.expected(
 landing_projector.wait_for(out.position, timeout=Duration::seconds(2))   // read-your-writes for the returned Code
 ```
 
-An honest note: MoonBit's `derive` covers a fixed set of traits, so the SDL and resolver skeletons are produced by `moon run tanden-inc/strata/gen graphql` from your enums and suberrors rather than derived at compile time. The generated code is checked in and type-checked against your domain, so a renamed variant still fails the build — but the "no codecs, no registries" promise of the storage format does not extend to your public schema. [`docs/graphql.md`](docs/graphql.md) covers cursors, N+1 over keyed projections, and error mapping.
+An honest note: MoonBit's `derive` covers a fixed set of traits, so the SDL and resolver skeletons are produced by `moon run tanden-inc/strata/gen graphql` from your enums and suberrors rather than derived at compile time. The generated code is checked in and type-checked against your domain, so a renamed variant still fails the build — but the "no codecs, no registries" promise of the storage format does not extend to your public schema. [the HTTP and GraphQL page](https://tanden-inc.github.io/strata/design/http-and-graphql) covers cursors, N+1 over keyed projections, and error mapping.
 
 ## Testing
 
@@ -998,5 +1006,3 @@ Strata would not exist without the people who worked out the ideas: the Decider 
 ## License
 
 Apache License 2.0. See [LICENSE](LICENSE).
-
-Apache-2.0. See [LICENSE](LICENSE).

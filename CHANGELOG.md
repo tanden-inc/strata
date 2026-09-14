@@ -6,6 +6,9 @@ All notable changes to Strata are recorded here. The format follows
 ## [Unreleased]
 
 ### Added
+- Documentation site (`docs/`, VitePress, deployed to GitHub Pages by the `docs` workflow): motivation, an eight-part
+  tutorial whose code is imported from `examples/` and the package tests by `#region` markers, concept and design pages,
+  ADR index, and a hand-written API reference; `examples/ledger/README.mbt.md` doc test; `make docs` / `make docs-build`.
 - Round 3: `ViewStore::checkpoint`, `KeyMissing`, red tests for id uniqueness across many decisions, reactor
   cancellation and backoff, key-store and reversal-law edge cases; `benchmarks/README.md` and a pure command-path benchmark.
 - Round 2 interface pieces for 1.0: `ViewStore::commit` + `Checkpoint` (atomic read side), `Selection::none`,

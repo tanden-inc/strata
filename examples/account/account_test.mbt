@@ -5,6 +5,7 @@ let alice : @strata.Actor = @strata.Actor("user:alice")
 let mallory : @strata.Actor = @strata.Actor("user:mallory")
 
 ///|
+// #region spec-basic
 test "withdrawals cannot exceed the balance" {
   @testing.spec(@account.account)
   .acting_as(actor=alice)
@@ -21,8 +22,10 @@ test "only the owner can withdraw" {
   .when(Withdraw(amount=10))
   |> debug_inspect(content="Err(NotOwner)")
 }
+// #endregion spec-basic
 
 ///|
+// #region spec-when-all
 test "close requires zero balance, then succeeds" {
   let spec = @testing.spec(@account.account)
     .acting_as(actor=alice)
@@ -49,8 +52,10 @@ test "a closed account is terminal" {
   assert_true(@account.account.is_terminal(spec.state()))
   spec.when(Deposit(amount=1)) |> debug_inspect(content="Err(AlreadyClosed)")
 }
+// #endregion spec-when-all
 
 ///|
+// #region replay-law
 test "replay equals snapshot plus tail" {
   let events : Array[@account.AccountEvent] = [
     @account.Opened(owner=alice),
@@ -60,8 +65,10 @@ test "replay equals snapshot plus tail" {
   ]
   @testing.replay_law(@account.account, events)
 }
+// #endregion replay-law
 
 ///|
+// #region preview
 test "preview runs the same rules without a store" {
   let preview = @strata.Preview(
     @account.account,
@@ -75,8 +82,10 @@ test "preview runs the same rules without a store" {
     content="Ok([Withdrawn(amount=20, by=Actor(\"user:alice\"))])",
   )
 }
+// #endregion preview
 
 ///|
+// #region view-fold
 test "the balance view folds deposits and withdrawals" {
   let events : Array[@account.AccountEvent] = [
     @account.Opened(owner=alice),
@@ -86,8 +95,10 @@ test "the balance view folds deposits and withdrawals" {
   @account.balance_view.fold(events.iter())
   |> debug_inspect(content="{ balance: 30, tx_count: 2 }")
 }
+// #endregion view-fold
 
 ///|
+// #region execute
 async test "execute appends and returns the stream version" {
   let rt = @testing.runtime()
   let accounts = rt.handler(@account.account)
@@ -100,8 +111,10 @@ async test "execute appends and returns the stream version" {
   inspect(out.events[0].id, content="evt-0002")
   inspect(out.events[0].stream, content="account-acc-1")
 }
+// #endregion execute
 
 ///|
+// #region rejection
 async test "domain rejections propagate unchanged" {
   let rt = @testing.runtime()
   let accounts = rt.handler(@account.account)
@@ -116,8 +129,10 @@ async test "domain rejections propagate unchanged" {
   }
   debug_inspect(rejected, content="Some((0, 1))")
 }
+// #endregion rejection
 
 ///|
+// #region idempotency
 async test "idempotent replay returns the original outcome" {
   let rt = @testing.runtime()
   let accounts = rt.handler(@account.account)
@@ -143,8 +158,10 @@ async test "idempotent replay returns the original outcome" {
   inspect(version, content="2")
   inspect(state.balance, content="100")
 }
+// #endregion idempotency
 
 ///|
+// #region conflict
 async test "a stale expected version conflicts" {
   let rt = @testing.runtime()
   let accounts = rt.handler(@account.account)
@@ -161,8 +178,10 @@ async test "a stale expected version conflicts" {
   }
   debug_inspect(conflict, content="Some((Exact(1), 2))")
 }
+// #endregion conflict
 
 ///|
+// #region live
 async test "live folds the stream on read and returns the version" {
   let rt = @testing.runtime()
   let accounts = rt.handler(@account.account)
@@ -177,8 +196,10 @@ async test "live folds the stream on read and returns the version" {
   )
   debug_inspect((view, version), content="({ balance: 70, tx_count: 2 }, 3)")
 }
+// #endregion live
 
 ///|
+// #region terminal
 async test "a terminal stream rejects further commands without deciding" {
   let rt = @testing.runtime()
   let accounts = rt.handler(@account.account)
@@ -194,3 +215,4 @@ async test "a terminal stream rejects further commands without deciding" {
   }
   assert_true(terminal)
 }
+// #endregion terminal

@@ -6,3 +6,11 @@ target/
 coverage/
 *.cov
 uncovered.log
+
+# docs site (VitePress)
+docs/node_modules/
+docs/.vitepress/dist/
+docs/.vitepress/cache/
+
+# local tool config
+.claude/

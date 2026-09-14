@@ -377,6 +377,7 @@ async test "inline projections and reads keep tenants apart" {
 }
 
 ///|
+// #region dead-letter
 async test "reactors retry a bounded number of times, then dead-letter" {
   let rt = @testing.runtime()
   let h = rt.handler(counter)
@@ -400,6 +401,7 @@ async test "reactors retry a bounded number of times, then dead-letter" {
   inspect(attempts.val, content="3")
   debug_inspect(dead, content="[\"evt-0001\"]")
   inspect(reactor.position(), content="1")
+  // #endregion dead-letter
   // without a dead-letter hook the failure is raised
   let loud = rt.reactor(
     "loud",

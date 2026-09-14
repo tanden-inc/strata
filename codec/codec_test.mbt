@@ -75,6 +75,7 @@ test "decode round-trips an encoded event" {
 }
 
 ///|
+// #region upgrade
 test "upgrade applies the rename, then upcasts in version order" {
   let codec = @codec.JsonCodec(schema_version=3)
   codec
@@ -98,8 +99,10 @@ test "upgrade applies the rename, then upcasts in version order" {
   ])
   json_inspect(data2, content=["Withdrawn", { "fee": 1, "amount": 10 }])
 }
+// #endregion upgrade
 
 ///|
+// #region compose
 test "upcasts compose and add_field does not overwrite" {
   let up = @codec.Upcast::add_field("fee", 0).then(
     @codec.Upcast::remove_field("legacy"),
@@ -107,6 +110,7 @@ test "upcasts compose and add_field does not overwrite" {
   json_inspect(up.run({ "fee": 5, "legacy": true }), content={ "fee": 5 })
   json_inspect(up.run({}), content={ "fee": 0 })
 }
+// #endregion compose
 
 ///|
 test "decode skips deprecated types and reports the position on failure" {
