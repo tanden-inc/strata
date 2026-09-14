@@ -1,0 +1,68 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "tanden-inc/strata/codec"
+
+import {
+  "moonbitlang/core/debug",
+  "moonbitlang/core/json",
+  "tanden-inc/strata/core",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub struct Encoded {
+  event_type : String
+  schema : Int
+  data : Json
+} derive(Eq, @debug.Debug)
+pub fn Encoded::Encoded(event_type~ : String, schema~ : Int, data~ : Json) -> Self
+
+pub(all) struct FieldPath(String) derive(Compare, Eq, Hash, @debug.Debug)
+
+pub struct JsonCodec {
+  // private fields
+}
+pub fn JsonCodec::JsonCodec(schema_version? : Int, style? : TagStyle) -> Self
+pub fn[E : @json.FromJson] JsonCodec::decode(Self, @core.StoredEvent) -> @core.Recorded[E]? raise @core.DecodeError
+pub fn[E : @json.FromJson] JsonCodec::decode_all(Self, Array[@core.StoredEvent]) -> Array[@core.Recorded[E]] raise @core.DecodeError
+pub fn JsonCodec::deprecated(Self, String, replaced_by? : String) -> Unit
+pub fn[E : ToJson] JsonCodec::encode(Self, E) -> Encoded raise @core.DecodeError
+pub fn JsonCodec::is_deprecated(Self, String) -> Bool
+pub fn JsonCodec::migrate(Self, String, from~ : Int, Upcast) -> Unit
+pub fn JsonCodec::rename(Self, String, to~ : String) -> Unit
+pub fn JsonCodec::schema_version(Self) -> Int
+pub fn JsonCodec::seal(Self, meta~ : Array[String], when~ : (@core.Context) -> Bool) -> Unit
+pub fn JsonCodec::sealed_meta(Self) -> Array[String]
+pub fn JsonCodec::seals(Self, @core.Context) -> Bool
+pub fn JsonCodec::shred(Self, fields~ : Array[FieldPath], redacted_as? : Json) -> Unit
+pub fn JsonCodec::shredded_fields(Self) -> Array[FieldPath]
+pub fn JsonCodec::style(Self) -> TagStyle
+pub fn JsonCodec::type_of(Self, Json) -> String raise @core.DecodeError
+pub fn JsonCodec::upgrade(Self, event_type~ : String, schema~ : Int, Json) -> (String, Json) raise @core.DecodeError
+
+pub(all) enum Sealed[T] {
+  Value(T)
+  Sealed
+  Shredded
+} derive(Eq, @debug.Debug)
+
+pub(all) enum TagStyle {
+  Flat
+  Legacy(tag_key~ : String)
+} derive(Eq, @debug.Debug)
+
+pub struct Upcast {
+  // private fields
+}
+pub fn Upcast::add_field(String, Json) -> Self
+pub fn Upcast::map((Json) -> Json raise) -> Self
+pub fn Upcast::remove_field(String) -> Self
+pub fn Upcast::rename_field(from~ : String, to~ : String) -> Self
+pub fn Upcast::run(Self, Json) -> Json raise
+pub fn Upcast::then(Self, Self) -> Self
+
+// Type aliases
+
+// Traits

@@ -1,0 +1,4 @@
+import {
+  "tanden-inc/strata/core" @strata,
+  "moonbitlang/core/json",
+}
